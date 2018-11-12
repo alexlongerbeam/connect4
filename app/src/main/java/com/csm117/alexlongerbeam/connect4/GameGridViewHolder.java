@@ -11,19 +11,22 @@ import android.widget.TextView;
  */
 
 //Class that changes the color of each circle in each row. This holds the "row" view
-public class GameGridViewHolder extends RecyclerView.ViewHolder {
+public class GameGridViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     public View mView;
 
     private ImageView[] circles;
 
-    public GameGridViewHolder(View v) {
+    private int rowNum;
+
+    private GameController controller;
+
+    public GameGridViewHolder(View v, GameController gc) {
         super(v);
         mView = v;
+        controller = gc;
 
         circles = new ImageView[7];
-
-        Log.d("GGVH", "GameGridViewHolder: ALEX" + v.toString());
 
         circles[0] = v.findViewById(R.id.circle0);
         circles[1] = v.findViewById(R.id.circle1);
@@ -33,25 +36,71 @@ public class GameGridViewHolder extends RecyclerView.ViewHolder {
         circles[5] = v.findViewById(R.id.circle5);
         circles[6] = v.findViewById(R.id.circle6);
 
-        Log.d("GGVH", "GameGridViewHolder: ALEX" + circles[0].toString());
-
+        for (int i=0; i<circles.length; i++) {
+            circles[i].setOnClickListener(this);
+        }
     }
 
-    public void setCircleColors(String[] row) {
-        for (int i = 0; i<row.length; i++) {
+    public void setCircleColors(String[] rowVals, int rowNumber) {
+
+        rowNum = rowNumber;
+
+        for (int i = 0; i<rowVals.length; i++) {
             if (circles[i] == null) {
                 Log.d("GGVH", "setCircleColors: ALEX NULL");
                 continue;
             }
-            if (row[i].equals("RED")) {
+            if (rowVals[i].equals("RED")) {
                 circles[i].setImageResource(R.drawable.red_circle);
             }
-            else if (row[i].equals("BLACK")) {
+            else if (rowVals[i].equals("BLACK")) {
                 circles[i].setImageResource(R.drawable.black_circle);
             }
             else {
                 circles[i].setImageResource(R.drawable.empty_circle);
             }
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.circle0:
+                broadcastClick(0);
+                break;
+            case R.id.circle1:
+                broadcastClick(1);
+                break;
+            case R.id.circle2:
+                broadcastClick(2);
+                break;
+            case R.id.circle3:
+                broadcastClick(3);
+                break;
+            case R.id.circle4:
+                broadcastClick(4);
+                break;
+            case R.id.circle5:
+                broadcastClick(5);
+                break;
+            case R.id.circle6:
+                broadcastClick(6);
+                break;
+
+
+            default:
+                break;
+
+
+        }
+    }
+
+    private void broadcastClick(int col) {
+        if (controller != null) {
+            controller.onCircleClicked(rowNum, col);
+        }
+        else {
+            Log.d("GGVH", "broadcastClick: ALEX controller null");
         }
     }
 }

@@ -17,27 +17,29 @@ public class GameGridAdapter extends RecyclerView.Adapter<GameGridViewHolder> {
 
     private String[][] mGrid;
 
-    public GameGridAdapter(String[][] grid) {
+    private GameController controller;
+
+    public GameGridAdapter(String[][] grid, GameController gc) {
 
         mGrid = new String[6][7];
 
         mGrid = grid;
+
+        controller = gc;
     }
 
     @NonNull
     @Override
     public GameGridViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d("GGA", "onCreateViewHolder:ALEX ");
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.grid_row, parent, false);
 
-        GameGridViewHolder holder = new GameGridViewHolder(v);
-        return holder;
+        return new GameGridViewHolder(v, controller);
     }
 
     @Override
     public void onBindViewHolder(@NonNull GameGridViewHolder holder, int position) {
-        holder.setCircleColors(mGrid[position]);
+        holder.setCircleColors(mGrid[position], position);
     }
 
     @Override
