@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingBottom="12dp">
+
+    <ImageView
+        android:id="@+id/circle0"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/empty_circle"
+        android:layout_margin="12dp"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <ImageView
+        android:id="@+id/circle1"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/empty_circle"
+        android:layout_margin="12dp"
+        app:layout_constraintStart_toEndOf="@id/circle0"/>
+
+    <ImageView
+        android:id="@+id/circle2"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/empty_circle"
+        android:layout_margin="12dp"
+        app:layout_constraintStart_toEndOf="@id/circle1"/>
+
+    <ImageView
+        android:id="@+id/circle3"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/empty_circle"
+        android:layout_margin="12dp"
+        app:layout_constraintStart_toEndOf="@id/circle2"/>
+
+    <ImageView
+        android:id="@+id/circle4"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/empty_circle"
+        android:layout_margin="12dp"
+        app:layout_constraintStart_toEndOf="@id/circle3"/>
+
+    <ImageView
+        android:id="@+id/circle5"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/empty_circle"
+        android:layout_margin="12dp"
+        app:layout_constraintStart_toEndOf="@id/circle4"/>
+
+    <ImageView
+        android:id="@+id/circle6"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/empty_circle"
+        android:layout_margin="12dp"
+        app:layout_constraintStart_toEndOf="@id/circle5"/>
+
+
+</android.support.constraint.ConstraintLayout>
