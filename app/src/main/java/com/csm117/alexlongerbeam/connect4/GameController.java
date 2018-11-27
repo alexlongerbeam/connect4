@@ -1,5 +1,8 @@
 package com.csm117.alexlongerbeam.connect4;
+import android.bluetooth.BluetoothSocket;
 import android.util.Log;
+
+import com.csm117.alexlongerbeam.connect4.BluetoothStuff.BluetoothController;
 //import com.plattysoft.leonids.ParticleSystem;
 /**
  * Created by alexlongerbeam on 11/12/18.
@@ -19,14 +22,18 @@ public class GameController {
 
     private int numCols;
 
+    private BluetoothController bluetoothController;
+
     private int turn;
 
-    public GameController(GameActivity a, String[][] initialBoard) {
+    public GameController(GameActivity a, String[][] initialBoard, BluetoothSocket s) {
         activity = a;
         currentBoard = initialBoard;
         numCols = initialBoard[0].length;
         heights = new int[numCols];
         turn = 0;
+
+        bluetoothController = new BluetoothController(this, s);
     }
 
     public void onCircleClicked(int row, int col) {
@@ -45,6 +52,8 @@ public class GameController {
             Log.d("Connect4", "turn " + turn);
             ++turn;
             /* WRITE MOVE WITH BLUETOOTH*/
+            //WRITE MOVE
+            bluetoothController.writeMove(new GameMove(col));
             if (winFlag)
                 endgame();
             else
@@ -53,6 +62,10 @@ public class GameController {
                     //read move and call function
             }
         }
+    }
+
+    public void moveReceived(GameMove m) {
+        Log.d("GameController", "moveReceived: " + m.column);
     }
 
     public void resetBoard() {

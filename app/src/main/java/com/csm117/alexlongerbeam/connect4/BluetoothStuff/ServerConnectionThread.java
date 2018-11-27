@@ -1,0 +1,69 @@
+package com.csm117.alexlongerbeam.connect4.BluetoothStuff;
+
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothServerSocket;
+import android.bluetooth.BluetoothSocket;
+import android.util.Log;
+
+import com.csm117.alexlongerbeam.connect4.HomeActivity;
+
+import java.io.IOException;
+import java.util.UUID;
+
+/**
+ * Created by alexlongerbeam on 11/26/18.
+ */
+
+public class ServerConnectionThread extends Thread {
+
+    private final BluetoothServerSocket mmServerSocket;
+
+    private final String TAG = "ServerConenctionThread";
+
+    private final UUID key = UUID.fromString("connect4btkey");
+
+
+
+    public ServerConnectionThread(BluetoothAdapter adapter) {
+        // Use a temporary object that is later assigned to mmServerSocket
+        // because mmServerSocket is final.
+        BluetoothServerSocket tmp = null;
+
+        try {
+            // MY_UUID is the app's UUID string, also used by the client code.
+            tmp = adapter.listenUsingRfcommWithServiceRecord("Connect4", key);
+        } catch (IOException e) {
+            Log.d(TAG, "ServerConnectionThread: Connection failed");
+        }
+        mmServerSocket = tmp;
+    }
+
+    public void run(HomeActivity activity) {
+        BluetoothSocket socket = null;
+        // Keep listening until exception occurs or a socket is returned.
+        while (true) {
+            try {
+                socket = mmServerSocket.accept();
+            } catch (IOException e) {
+                Log.e(TAG, "Socket's accept() method failed", e);
+                break;
+            }
+
+            if (socket != null) {
+                // A connection was accepted. Perform work associated with
+                // the connection in a separate thread.
+                activity.socketFound(socket);
+                break;
+            }
+        }
+    }
+
+    // Closes the connect socket and causes the thread to finish.
+    public void cancel() {
+        try {
+            mmServerSocket.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Could not close the connect socket", e);
+        }
+    }
+}
