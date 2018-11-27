@@ -4,7 +4,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 /**
  * Created by alexlongerbeam on 11/11/18.
@@ -55,6 +54,12 @@ public class GameGridViewHolder extends RecyclerView.ViewHolder implements View.
             }
             else if (rowVals[i].equals("BLACK")) {
                 circles[i].setImageResource(R.drawable.black_circle);
+            }
+            else if (rowVals[i].equals("GREEN")) {
+                circles[i].setImageResource(R.drawable.green_circle);
+            }
+            else if (rowVals[i].equals("YELLOW")) {
+                circles[i].setImageResource(R.drawable.yellow_circle);
             }
             else {
                 circles[i].setImageResource(R.drawable.empty_circle);
