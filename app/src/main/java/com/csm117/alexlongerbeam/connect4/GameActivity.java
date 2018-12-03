@@ -45,10 +45,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         resetButton = findViewById(R.id.reset_button);
         resetButton.setOnClickListener(this);
 
-        //get bt socket from intent
-        BluetoothGameStart startInfo = (BluetoothGameStart) getIntent().getSerializableExtra("BTGameStart");
-
-        controller = new GameController(this, INITIAL_BOARD, startInfo.socket);
+        controller = new GameController(this, INITIAL_BOARD);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         gameBoard.setLayoutManager(layoutManager);

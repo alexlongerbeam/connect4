@@ -20,7 +20,7 @@ public class ServerConnectionThread extends Thread {
 
     private final String TAG = "ServerConenctionThread";
 
-    private final UUID key = UUID.fromString("connect4btkey");
+    private final UUID key;
 
 
 
@@ -28,6 +28,12 @@ public class ServerConnectionThread extends Thread {
         // Use a temporary object that is later assigned to mmServerSocket
         // because mmServerSocket is final.
         BluetoothServerSocket tmp = null;
+
+        Log.d(TAG, "ServerConnectionThread: ALEX Starting server");
+
+        //key = UUID.fromString("connect4btkey");
+
+        key = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
         try {
             // MY_UUID is the app's UUID string, also used by the client code.
@@ -41,6 +47,7 @@ public class ServerConnectionThread extends Thread {
     public void run(HomeActivity activity) {
         BluetoothSocket socket = null;
         // Keep listening until exception occurs or a socket is returned.
+        Log.d(TAG, "run: ALEX Running server thread");
         while (true) {
             try {
                 socket = mmServerSocket.accept();

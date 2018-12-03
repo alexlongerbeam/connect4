@@ -21,13 +21,28 @@ public class BluetoothController extends Thread {
     private static final String TAG = "Bluetooth Controller";
     private GameController gameController;
 
-    private final BluetoothSocket mSocket;
-    private final InputStream mmInStream;
-    private final OutputStream mmOutStream;
+    private BluetoothSocket mSocket;
+    private InputStream mmInStream;
+    private OutputStream mmOutStream;
 
-    public BluetoothController(GameController gc, BluetoothSocket socket) {
-        mSocket = socket;
+    private static BluetoothController mController;
+
+    public static BluetoothController getInstance() {
+        if (mController == null) {
+            mController = new BluetoothController();
+        }
+        return mController;
+    }
+
+    private BluetoothController() {
+
+    }
+
+    public void setGameController(GameController gc) {
         gameController = gc;
+    }
+    public void setSocket(BluetoothSocket socket) {
+        mSocket = socket;
         InputStream tmpIn = null;
         OutputStream tmpOut = null;
         // Get the input and output streams; using temp objects because
@@ -57,19 +72,20 @@ public class BluetoothController extends Thread {
 
                 gameController.moveReceived(move);
             } catch (IOException | ClassNotFoundException e) {
-                Log.i("ERROR", "E:"+e.getLocalizedMessage());
+                Log.i("ERROR", "Run error:"+e.getLocalizedMessage());
             }
         }
     }
 
     // Call this from the main activity to send data to the remote device.
     public void writeMove(GameMove move) {
+        Log.d(TAG, "writeMove: ALEX WRITE MOVE");
         try {
             ObjectOutputStream oos = new  ObjectOutputStream(mmOutStream);
             oos.writeObject(move);
             oos.close();
         }catch(Exception e){
-            Log.e(TAG, "Error ObjectOutputStream: "+e.getLocalizedMessage());
+            Log.e(TAG, "Error WRITE ObjectOutputStream: "+e.getLocalizedMessage());
         }
     }
 

@@ -21,7 +21,7 @@ public class ClientConnectionThread extends Thread {
 
     private final String TAG = "ClientConnectionThread";
 
-    private final UUID key = UUID.fromString("connect4btkey");
+    private final UUID key;
     public ClientConnectionThread(BluetoothDevice device, BluetoothAdapter adapter) {
         // Use a temporary object that is later assigned to mmSocket
         // because mmSocket is final.
@@ -29,6 +29,8 @@ public class ClientConnectionThread extends Thread {
         mmDevice = device;
 
         mAdapter = adapter;
+
+        key = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
         try {
             // Get a BluetoothSocket to connect with the given BluetoothDevice.

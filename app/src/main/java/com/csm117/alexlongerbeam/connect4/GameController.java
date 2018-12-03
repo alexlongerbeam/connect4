@@ -22,18 +22,17 @@ public class GameController {
 
     private int numCols;
 
-    private BluetoothController bluetoothController;
-
     private int turn;
 
-    public GameController(GameActivity a, String[][] initialBoard, BluetoothSocket s) {
+    public GameController(GameActivity a, String[][] initialBoard) {
         activity = a;
         currentBoard = initialBoard;
         numCols = initialBoard[0].length;
         heights = new int[numCols];
         turn = 0;
 
-        bluetoothController = new BluetoothController(this, s);
+        BluetoothController.getInstance().setGameController(this);
+        BluetoothController.getInstance().start();
     }
 
     public void onCircleClicked(int row, int col) {
@@ -49,11 +48,11 @@ public class GameController {
             else
                 winFlag = checkWinP2(6 - heights[col], col);
             heights[col] += 1;
-            Log.d("Connect4", "turn " + turn);
+            Log.d("Connect4", "ALEX turn " + turn);
             ++turn;
             /* WRITE MOVE WITH BLUETOOTH*/
             //WRITE MOVE
-            bluetoothController.writeMove(new GameMove(col));
+            BluetoothController.getInstance().writeMove(new GameMove(col));
             if (winFlag)
                 endgame();
             else
@@ -65,7 +64,7 @@ public class GameController {
     }
 
     public void moveReceived(GameMove m) {
-        Log.d("GameController", "moveReceived: " + m.column);
+        Log.d("GameController", "ALEX moveReceived: " + m.column);
     }
 
     public void resetBoard() {
