@@ -1,5 +1,6 @@
 package com.csm117.alexlongerbeam.connect4;
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
@@ -8,6 +9,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -44,6 +48,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     ArrayList<BluetoothDevice> foundDevices;
 
     private boolean isStarter;
+
+    private final int PERMISSION_CODE = 25;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +127,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         isStarter= true;
 
+        if (!checkLocationPermission()) {
+            return;
+        }
+
+        startServerThread();
+
+    }
+
+    private void startServerThread() {
         Log.d(TAG, "startServer: ALEX");
         startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE), 2);
         Log.d(TAG, "startServer: ALEX made discoverable");
@@ -137,14 +152,21 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
         isStarter = false;
 
+        if (!checkLocationPermission()) {
+            return;
+        }
+
+        startClientDiscovery();
+
+    }
+
+    private void startClientDiscovery() {
         Log.d(TAG, "startClient: ALEX starting discovery");
         registerReceiver(mReceiver, btFilter);
         adapter.startDiscovery();
         statusText.setText("Scanning for devices...");
         statusText.setVisibility(View.VISIBLE);
         Log.d(TAG, "startClient: ALEX after discovery");
-
-
     }
 
     public void socketFound(BluetoothSocket socket) {
@@ -181,6 +203,50 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             default:
                 break;
 
+
+        }
+    }
+
+    public boolean checkLocationPermission() {
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is not granted
+            // No explanation needed; request the permission
+            Log.d(TAG, "checkLocationPermission: asking for location permission");
+            ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_CODE);
+
+
+            return false;
+        } else {
+            // Permission has already been granted
+            return true;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_CODE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    Log.d(TAG, "onRequestPermissionsResult: ALEX location permission granted");
+
+                    if (isStarter) {
+                        startServerThread();
+                    } else {
+                        startClientDiscovery();
+                    }
+                } else {
+                    Log.d(TAG, "onRequestPermissionsResult: ALEX LOCATION permission not allowed");
+                }
+                return;
+            }
 
         }
     }
