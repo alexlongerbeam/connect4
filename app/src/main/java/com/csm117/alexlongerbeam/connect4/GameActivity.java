@@ -92,6 +92,14 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         statusText.setText(text);
     }
 
+    public void setMyColorRed(boolean red) {
+        if (red) {
+            myColor.setImageResource(R.drawable.red_circle);
+        } else {
+            myColor.setImageResource(R.drawable.black_circle);
+        }
+    }
+
 
 
 }

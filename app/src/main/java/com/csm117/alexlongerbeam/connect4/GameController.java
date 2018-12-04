@@ -1,5 +1,8 @@
 package com.csm117.alexlongerbeam.connect4;
 import android.bluetooth.BluetoothSocket;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 
 import com.csm117.alexlongerbeam.connect4.BluetoothStuff.BluetoothController;
@@ -24,45 +27,84 @@ public class GameController {
 
     private boolean yourTurn;
 
+    private static final String TAG = "GameController";
+
+    String myColor;
+    String opponentColor;
+
+    Runnable onMovePosted = new Runnable() {
+        @Override
+        public void run() {
+            Log.d(TAG, "run: ALEX run called");
+            moveReceived();
+        }
+    };
+
+    private GameMove mostRecentMove;
+
     public GameController(GameActivity a, String[][] initialBoard, boolean turn) {
         activity = a;
         currentBoard = initialBoard;
         numCols = initialBoard[0].length;
         heights = new int[numCols];
         yourTurn = turn;
-
+        if (yourTurn) {
+            myColor = "RED";
+            opponentColor = "BLACK";
+            activity.setMyColorRed(true);
+        } else {
+            myColor = "BLACK";
+            opponentColor = "RED";
+            activity.setMyColorRed(false);
+        }
         BluetoothController.getInstance().setGameController(this);
         BluetoothController.getInstance().start();
+
+        updateStatusText();
+
+
     }
 
     public void onCircleClicked(int row, int col) {
         if(yourTurn)
         {
             if (heights[col] <= 6) {
-                currentBoard[6 - heights[col]][col] = "RED";
+                currentBoard[6 - heights[col]][col] = myColor;
                 activity.updateGameBoard(currentBoard);
-                boolean winFlag = checkWin(6 - heights[col], col, "RED");
+                boolean winFlag = checkWin(6 - heights[col], col, myColor);
                 heights[col] += 1;
                 /* WRITE MOVE WITH BLUETOOTH*/
                 BluetoothController.getInstance().writeMove(new GameMove(col));
-                if (winFlag)
+                if (winFlag) {
                     wonGame();
+                    return;
+                }
                 yourTurn = false;
+                updateStatusText();
             }
         }
     }
 
-    public void moveReceived(GameMove m) {
-        Log.d("GameController", "ALEX moveReceived: " + m.column);
+    public void setMostRecentMove(GameMove m) {
+        Log.d(TAG, "setMostRecentMove: ALEX move set: " + m.column);
+        mostRecentMove = m;
+        activity.runOnUiThread(onMovePosted);
+    }
+
+    private void moveReceived() {
+        Log.d("GameController", "ALEX moveReceived: " + mostRecentMove.column);
         if (yourTurn == false) {
-            if (heights[m.column] <= 6) {
-                currentBoard[6 - heights[m.column]][m.column] = "BLACK";
+            if (heights[mostRecentMove.column] <= 6) {
+                currentBoard[6 - heights[mostRecentMove.column]][mostRecentMove.column] = opponentColor;
                 activity.updateGameBoard(currentBoard);
-                boolean winFlag = checkWin(6 - heights[m.column], m.column, "BLACK");
-                heights[m.column] += 1;
-                if (winFlag)
+                boolean winFlag = checkWin(6 - heights[mostRecentMove.column], mostRecentMove.column, opponentColor);
+                heights[mostRecentMove.column] += 1;
+                if (winFlag) {
                     lostGame();
+                    return;
+                }
                 yourTurn = true;
+                updateStatusText();
             }
         }
     }
@@ -406,6 +448,7 @@ public class GameController {
 */
 
     public void wonGame() {
+        activity.setStatusText("YOU WON!!");
 //        new ParticleSystem(activity, 80, R.drawable.confeti2, 10000)
 //                .setSpeedModuleAndAngleRange(0f, 0.3f, 180, 180)
 //                .setRotationSpeed(144)
@@ -420,6 +463,12 @@ public class GameController {
     }
 
     public void lostGame() {
+        activity.setStatusText("You lost :(");
 
+    }
+
+    private void updateStatusText() {
+        String status = yourTurn ? "Your move!" : "Waiting for opponent's move...";
+        activity.setStatusText(status);
     }
 }

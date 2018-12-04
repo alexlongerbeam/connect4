@@ -1,9 +1,11 @@
 package com.csm117.alexlongerbeam.connect4.BluetoothStuff;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothSocket;
 import android.os.Message;
 import android.util.Log;
 
+import com.csm117.alexlongerbeam.connect4.GameActivity;
 import com.csm117.alexlongerbeam.connect4.GameController;
 import com.csm117.alexlongerbeam.connect4.GameMove;
 
@@ -84,7 +86,7 @@ public class BluetoothController extends Thread {
         while (true) {
             try {
                 GameMove move = (GameMove) ois.readObject();
-                gameController.moveReceived(move);
+                gameController.setMostRecentMove(move);
             } catch (IOException | ClassNotFoundException e) {
                 Log.i("ERROR", "Run error:"+e.getLocalizedMessage());
             }
