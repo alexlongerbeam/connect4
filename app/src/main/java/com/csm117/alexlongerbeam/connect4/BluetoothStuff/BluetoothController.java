@@ -25,6 +25,9 @@ public class BluetoothController extends Thread {
     private InputStream mmInStream;
     private OutputStream mmOutStream;
 
+    private ObjectOutputStream oos;
+    private ObjectInputStream ois;
+
     private static BluetoothController mController;
 
     public static BluetoothController getInstance() {
@@ -61,15 +64,26 @@ public class BluetoothController extends Thread {
         mmInStream = tmpIn;
         mmOutStream = tmpOut;
 
+        try {
+            oos = new ObjectOutputStream(mmOutStream);
+        } catch (IOException e) {
+            Log.e(TAG, "Error occurred when creating object output stream", e);
+        }
+
+        try {
+            ois = new ObjectInputStream(mmInStream);
+        } catch (IOException e) {
+            Log.e(TAG, "Error occurred when creating object input stream", e);
+        }
+
+
+
     }
     public void run() {
 
         while (true) {
             try {
-
-                ObjectInputStream ois = new ObjectInputStream(mmInStream);
                 GameMove move = (GameMove) ois.readObject();
-
                 gameController.moveReceived(move);
             } catch (IOException | ClassNotFoundException e) {
                 Log.i("ERROR", "Run error:"+e.getLocalizedMessage());
@@ -81,9 +95,7 @@ public class BluetoothController extends Thread {
     public void writeMove(GameMove move) {
         Log.d(TAG, "writeMove: ALEX WRITE MOVE");
         try {
-            ObjectOutputStream oos = new  ObjectOutputStream(mmOutStream);
             oos.writeObject(move);
-            oos.close();
         }catch(Exception e){
             Log.e(TAG, "Error WRITE ObjectOutputStream: "+e.getLocalizedMessage());
         }

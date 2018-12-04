@@ -8,6 +8,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.csm117.alexlongerbeam.connect4.BluetoothStuff.BluetoothController;
 import com.csm117.alexlongerbeam.connect4.BluetoothStuff.BluetoothGameStart;
@@ -24,7 +26,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     private GameController controller;
 
-    private Button resetButton;
+    private ImageView myColor;
+
+    private TextView statusText;
 
     private final String[][] INITIAL_BOARD = {{"null", "null", "null", "null", "null", "null", "null"},
             {"null", "null", "null", "null", "null", "null", "null"},
@@ -40,12 +44,23 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game_layout);
 
+        Bundle b = getIntent().getExtras();
+
+        String role = b.getString("Role");
+
         gameBoard = findViewById(R.id.game_grid);
 
-        resetButton = findViewById(R.id.reset_button);
-        resetButton.setOnClickListener(this);
+        myColor = findViewById(R.id.your_color);
+        statusText = findViewById(R.id.game_status);
 
-        controller = new GameController(this, INITIAL_BOARD);
+        boolean starter;
+        if (role.equals("Start")) {
+            starter = true;
+        } else {
+            starter = false;
+        }
+
+        controller = new GameController(this, INITIAL_BOARD, starter);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         gameBoard.setLayoutManager(layoutManager);
@@ -53,9 +68,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         GameGridAdapter adapter = new GameGridAdapter(INITIAL_BOARD, controller);
         gameBoard.setAdapter(adapter);
-
-
-
 
 
     }
@@ -70,16 +82,16 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.reset_button:
-                controller.resetBoard();
-                break;
 
             default:
                 break;
-
-
         }
     }
+
+    public void setStatusText(String text) {
+        statusText.setText(text);
+    }
+
 
 
 }

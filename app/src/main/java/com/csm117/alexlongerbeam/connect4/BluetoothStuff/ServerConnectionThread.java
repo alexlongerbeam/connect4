@@ -23,11 +23,14 @@ public class ServerConnectionThread extends Thread {
     private final UUID key;
 
 
+    private HomeActivity activity;
 
-    public ServerConnectionThread(BluetoothAdapter adapter) {
+    public ServerConnectionThread(BluetoothAdapter adapter, HomeActivity a) {
         // Use a temporary object that is later assigned to mmServerSocket
         // because mmServerSocket is final.
         BluetoothServerSocket tmp = null;
+
+        activity = a;
 
         Log.d(TAG, "ServerConnectionThread: ALEX Starting server");
 
@@ -44,7 +47,7 @@ public class ServerConnectionThread extends Thread {
         mmServerSocket = tmp;
     }
 
-    public void run(HomeActivity activity) {
+    public void run() {
         BluetoothSocket socket = null;
         // Keep listening until exception occurs or a socket is returned.
         Log.d(TAG, "run: ALEX Running server thread");

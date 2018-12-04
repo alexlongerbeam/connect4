@@ -21,14 +21,18 @@ public class ClientConnectionThread extends Thread {
 
     private final String TAG = "ClientConnectionThread";
 
+    private HomeActivity activity;
+
     private final UUID key;
-    public ClientConnectionThread(BluetoothDevice device, BluetoothAdapter adapter) {
+    public ClientConnectionThread(BluetoothDevice device, BluetoothAdapter adapter, HomeActivity a) {
         // Use a temporary object that is later assigned to mmSocket
         // because mmSocket is final.
         BluetoothSocket tmp = null;
         mmDevice = device;
 
         mAdapter = adapter;
+
+        activity = a;
 
         key = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
@@ -42,7 +46,7 @@ public class ClientConnectionThread extends Thread {
         mmSocket = tmp;
     }
 
-    public void run(HomeActivity activity) {
+    public void run() {
         // Cancel discovery because it otherwise slows down the connection.
         mAdapter.cancelDiscovery();
 

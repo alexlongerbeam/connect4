@@ -14,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.csm117.alexlongerbeam.connect4.BluetoothStuff.BluetoothController;
@@ -26,9 +27,9 @@ import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener {
 
-    TextView startButton;
+    Button startButton;
 
-    TextView joinButton;
+    Button joinButton;
 
     TextView statusText;
 
@@ -41,6 +42,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     RecyclerView dList;
 
     ArrayList<BluetoothDevice> foundDevices;
+
+    private boolean isStarter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,8 +107,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     public void onDeviceClicked(BluetoothDevice d) {
         Log.d(TAG, "onDeviceClicked: ALEX Device clicked: " + d.getName());
-        ClientConnectionThread clientThread = new ClientConnectionThread(d, adapter);
-        clientThread.run(this);
+        ClientConnectionThread clientThread = new ClientConnectionThread(d, adapter, this);
+        clientThread.start();
     }
 
 
@@ -116,11 +119,15 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             Log.d(TAG, "startServer: ALEX no adapter");
         }
 
+        isStarter= true;
+
         Log.d(TAG, "startServer: ALEX");
         startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE), 2);
         Log.d(TAG, "startServer: ALEX made discoverable");
-        ServerConnectionThread serverThread = new ServerConnectionThread(adapter);
-        serverThread.run(this);
+        statusText.setText("Waiting for connection...");
+        statusText.setVisibility(View.VISIBLE);
+        ServerConnectionThread serverThread = new ServerConnectionThread(adapter, this);
+        serverThread.start();
     }
 
     private void startClient() {
@@ -128,6 +135,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             Intent bluetoothOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(bluetoothOn, 1);
         }
+        isStarter = false;
 
         Log.d(TAG, "startClient: ALEX starting discovery");
         registerReceiver(mReceiver, btFilter);
@@ -142,6 +150,20 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void socketFound(BluetoothSocket socket) {
         BluetoothController.getInstance().setSocket(socket);
         Intent gameIntent = new Intent(this, GameActivity.class);
+
+        Bundle b = new Bundle();
+
+        String role;
+        if (isStarter) {
+            role = "Start";
+        } else {
+            role = "Client";
+        }
+
+        b.putString("Role", role);
+
+        gameIntent.putExtras(b);
+
         startActivity(gameIntent);
     }
 
@@ -151,8 +173,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         switch (view.getId()){
             case R.id.start_button:
                 Log.d(TAG, "onClick: ALEX start server");
-                statusText.setText("Waiting for connection...");
-                statusText.setVisibility(View.VISIBLE);
                 startServer();
                 break;
             case R.id.join_button:
@@ -165,8 +185,4 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-//    private void startGame() {
-//        Intent gameIntent = new Intent(this, GameActivity.class);
-//        startActivity(gameIntent);
-//    }
 }
