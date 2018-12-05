@@ -89,6 +89,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         DeviceViewHolderAdapter a = new DeviceViewHolderAdapter(foundDevices, this);
         dList.setAdapter(a);
+
+        BluetoothController.getInstance().start();
     }
 
     @Override

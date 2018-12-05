@@ -62,7 +62,7 @@ public class GameController {
             activity.setMyColorRed(false);
         }
         BluetoothController.getInstance().setGameController(this);
-        BluetoothController.getInstance().start();
+        BluetoothController.getInstance().running = true;
 
         updateStatusText();
 

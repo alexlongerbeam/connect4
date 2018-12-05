@@ -30,6 +30,8 @@ public class BluetoothController extends Thread {
     private ObjectOutputStream oos;
     private ObjectInputStream ois;
 
+    public boolean running;
+
     private static BluetoothController mController;
 
     public static BluetoothController getInstance() {
@@ -40,7 +42,7 @@ public class BluetoothController extends Thread {
     }
 
     private BluetoothController() {
-
+        running = false;
     }
 
     public void setGameController(GameController gc) {
@@ -84,12 +86,14 @@ public class BluetoothController extends Thread {
     public void run() {
 
         while (true) {
-            try {
-                GameMove move = (GameMove) ois.readObject();
-                gameController.setMostRecentMove(move);
-            } catch (IOException | ClassNotFoundException e) {
-                gameController.endGame();
-                Log.i("ERROR", "Run error:"+e.getLocalizedMessage());
+            if (running) {
+                try {
+                    GameMove move = (GameMove) ois.readObject();
+                    gameController.setMostRecentMove(move);
+                } catch (IOException | ClassNotFoundException e) {
+                    gameController.endGame();
+                    Log.i("ERROR", "Run error:" + e.getLocalizedMessage());
+                }
             }
         }
     }
@@ -109,6 +113,7 @@ public class BluetoothController extends Thread {
     public void cancel() {
         try {
             mSocket.close();
+            running = false;
         } catch (IOException e) {
             Log.e(TAG, "Could not close the connect socket", e);
         }
