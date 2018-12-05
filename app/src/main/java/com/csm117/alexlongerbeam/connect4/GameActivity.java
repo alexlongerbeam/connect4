@@ -96,7 +96,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         if (red) {
             myColor.setImageResource(R.drawable.red_circle);
         } else {
-            myColor.setImageResource(R.drawable.black_circle);
+            myColor.setImageResource(R.drawable.yellow_circle);
         }
     }
 
