@@ -90,6 +90,13 @@ public class GameController {
         }
     }
 
+    public void sendReset() {
+        BluetoothController.getInstance().writeMove(new GameMove(GameMove.RESET));
+        resetBoard();
+        yourTurn = false;
+        updateStatusText();
+    }
+
     public void setMostRecentMove(GameMove m) {
         Log.d(TAG, "setMostRecentMove: ALEX move set: " + m.column);
         mostRecentMove = m;
@@ -98,7 +105,17 @@ public class GameController {
 
     private void moveReceived() {
         Log.d("GameController", "ALEX moveReceived: " + mostRecentMove.column);
-        if (yourTurn == false) {
+        if (!yourTurn) {
+            if (mostRecentMove.column == GameMove.RESET) {
+                resetBoard();
+                yourTurn = true;
+                updateStatusText();
+                activity.setButtonsVisible(false);
+                return;
+            }
+            if (mostRecentMove.column == GameMove.END) {
+                endGame();
+            }
             if (heights[mostRecentMove.column] <= 6) {
                 currentBoard[6 - heights[mostRecentMove.column]][mostRecentMove.column] = opponentColor;
                 activity.updateGameBoard(currentBoard);
@@ -112,6 +129,11 @@ public class GameController {
                 updateStatusText();
             }
         }
+    }
+
+    public void endGame() {
+        BluetoothController.getInstance().cancel();
+        activity.endActivity();
     }
 
     public void resetBoard() {
@@ -454,6 +476,7 @@ public class GameController {
 
     public void wonGame() {
         activity.setStatusText("YOU WON!!");
+        activity.setButtonsVisible(true);
 //        new ParticleSystem(activity, 80, R.drawable.confeti2, 10000)
 //                .setSpeedModuleAndAngleRange(0f, 0.3f, 180, 180)
 //                .setRotationSpeed(144)
@@ -469,6 +492,7 @@ public class GameController {
 
     public void lostGame() {
         activity.setStatusText("You lost :(");
+        activity.setButtonsVisible(true);
 
     }
 

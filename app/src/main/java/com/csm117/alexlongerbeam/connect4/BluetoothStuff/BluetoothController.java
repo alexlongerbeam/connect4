@@ -88,6 +88,7 @@ public class BluetoothController extends Thread {
                 GameMove move = (GameMove) ois.readObject();
                 gameController.setMostRecentMove(move);
             } catch (IOException | ClassNotFoundException e) {
+                gameController.endGame();
                 Log.i("ERROR", "Run error:"+e.getLocalizedMessage());
             }
         }

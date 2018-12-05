@@ -51,6 +51,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private final int PERMISSION_CODE = 25;
 
+    private ServerConnectionThread serverThread;
+
+    private ClientConnectionThread clientThread;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +91,23 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         dList.setAdapter(a);
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        statusText.setText("");
+        foundDevices.clear();
+        updateDeviceList();
+        if (clientThread != null) {
+            clientThread.cancel();
+        }
+
+        if (serverThread != null) {
+            serverThread.cancel();
+        }
+
+
+    }
+
     // Create a BroadcastReceiver for ACTION_FOUND.
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -113,7 +136,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     public void onDeviceClicked(BluetoothDevice d) {
         Log.d(TAG, "onDeviceClicked: ALEX Device clicked: " + d.getName());
-        ClientConnectionThread clientThread = new ClientConnectionThread(d, adapter, this);
+        clientThread = new ClientConnectionThread(d, adapter, this);
         clientThread.start();
     }
 
@@ -141,7 +164,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         Log.d(TAG, "startServer: ALEX made discoverable");
         statusText.setText("Waiting for connection...");
         statusText.setVisibility(View.VISIBLE);
-        ServerConnectionThread serverThread = new ServerConnectionThread(adapter, this);
+        serverThread = new ServerConnectionThread(adapter, this);
         serverThread.start();
     }
 
@@ -180,7 +203,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             role = "Start";
         } else {
             role = "Client";
+            adapter.cancelDiscovery();
         }
+
 
         b.putString("Role", role);
 

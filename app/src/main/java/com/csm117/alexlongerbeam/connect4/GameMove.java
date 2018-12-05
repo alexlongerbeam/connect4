@@ -8,6 +8,10 @@ import java.io.Serializable;
 
 public class GameMove implements Serializable {
 
+    public static final int RESET = -1;
+
+    public static final int END = -2;
+
     public int column;
 
     public GameMove(int col) {

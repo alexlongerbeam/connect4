@@ -30,6 +30,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     private TextView statusText;
 
+    private Button endGame;
+    private Button restartGame;
+
     private final String[][] INITIAL_BOARD = {{"null", "null", "null", "null", "null", "null", "null"},
             {"null", "null", "null", "null", "null", "null", "null"},
             {"null", "null", "null", "null", "null", "null", "null"},
@@ -52,6 +55,11 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         myColor = findViewById(R.id.your_color);
         statusText = findViewById(R.id.game_status);
+        endGame = findViewById(R.id.end_game);
+        restartGame = findViewById(R.id.restart);
+
+        endGame.setOnClickListener(this);
+        restartGame.setOnClickListener(this);
 
         boolean starter;
         if (role.equals("Start")) {
@@ -78,14 +86,30 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         gameBoard.setAdapter(adapter);
     }
 
+    public void setButtonsVisible(boolean visible) {
+        int v = visible ? View.VISIBLE : View.INVISIBLE;
+
+        endGame.setVisibility(v);
+        restartGame.setVisibility(v);
+    }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-
+            case R.id.end_game:
+                controller.endGame();
+                break;
+            case R.id.restart:
+                controller.sendReset();
+                setButtonsVisible(false);
+                break;
             default:
                 break;
         }
+    }
+
+    public void endActivity() {
+        finish();
     }
 
     public void setStatusText(String text) {
