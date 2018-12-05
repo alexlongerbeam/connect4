@@ -3,10 +3,11 @@ import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.provider.Telephony;
 import android.util.Log;
 
 import com.csm117.alexlongerbeam.connect4.BluetoothStuff.BluetoothController;
-//import com.plattysoft.leonids.ParticleSystem;
+import com.plattysoft.leonids.ParticleSystem;
 /**
  * Created by alexlongerbeam on 11/12/18.
  */
@@ -34,11 +35,26 @@ public class GameController {
     String winColor;
     String loseColor;
 
+    private ParticleSystem upLeftP;
+    private ParticleSystem upRightP;
+
     Runnable onMovePosted = new Runnable() {
         @Override
         public void run() {
             Log.d(TAG, "run: ALEX run called");
             moveReceived();
+        }
+    };
+
+    Runnable stopConfetti = new Runnable() {
+        @Override
+        public void run() {
+            if (upRightP != null) {
+                upRightP.cancel();
+            }
+            if (upLeftP != null) {
+                upLeftP.cancel();
+            }
         }
     };
 
@@ -133,6 +149,7 @@ public class GameController {
 
     public void endGame() {
         BluetoothController.getInstance().cancel();
+        activity.runOnUiThread(stopConfetti);
         activity.endActivity();
     }
 
@@ -144,6 +161,13 @@ public class GameController {
             }
         }
         activity.updateGameBoard(currentBoard);
+        if (upRightP != null) {
+            upRightP.cancel();
+        }
+        if (upLeftP != null) {
+            upLeftP.cancel();
+        }
+
     }
 
     public boolean checkFull() {
@@ -477,17 +501,18 @@ public class GameController {
     public void wonGame() {
         activity.setStatusText("YOU WON!!");
         activity.setButtonsVisible(true);
-//        new ParticleSystem(activity, 80, R.drawable.confeti2, 10000)
-//                .setSpeedModuleAndAngleRange(0f, 0.3f, 180, 180)
-//                .setRotationSpeed(144)
-//                .setAcceleration(0.00005f, 90)
-//                .emit(activity.findViewById(R.id.emiter_top_right), 8);
-//
-//        new ParticleSystem(activity, 80, R.drawable.confeti3, 10000)
-//                .setSpeedModuleAndAngleRange(0f, 0.3f, 0, 0)
-//                .setRotationSpeed(144)
-//                .setAcceleration(0.00005f, 90)
-//                .emit(activity.findViewById(R.id.emiter_top_left), 8);
+        upLeftP = new ParticleSystem(activity, 80, R.drawable.confetti1, 15000);
+                upLeftP.setSpeedModuleAndAngleRange(0f, 0.3f, 180, 180)
+                .setRotationSpeed(144)
+                .setAcceleration(0.00005f, 90)
+                .emit(activity.findViewById(R.id.emiter_top_right), 8);
+
+        upRightP = new ParticleSystem(activity, 80, R.drawable.confetti2, 15000);
+
+                upRightP.setSpeedModuleAndAngleRange(0f, 0.3f, 0, 0)
+                .setRotationSpeed(144)
+                .setAcceleration(0.00005f, 90)
+                .emit(activity.findViewById(R.id.emiter_top_left), 8);
     }
 
     public void lostGame() {
