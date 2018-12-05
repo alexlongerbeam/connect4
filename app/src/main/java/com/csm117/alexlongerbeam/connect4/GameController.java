@@ -31,6 +31,8 @@ public class GameController {
 
     String myColor;
     String opponentColor;
+    String winColor;
+    String loseColor;
 
     Runnable onMovePosted = new Runnable() {
         @Override
@@ -48,12 +50,14 @@ public class GameController {
         numCols = initialBoard[0].length;
         heights = new int[numCols];
         yourTurn = turn;
+        winColor = "GREEN";
+        loseColor = "BLACK";
         if (yourTurn) {
             myColor = "RED";
-            opponentColor = "BLACK";
+            opponentColor = "YELLOW";
             activity.setMyColorRed(true);
         } else {
-            myColor = "BLACK";
+            myColor = "YELLOW";
             opponentColor = "RED";
             activity.setMyColorRed(false);
         }
@@ -71,12 +75,13 @@ public class GameController {
             if (heights[col] <= 6) {
                 currentBoard[6 - heights[col]][col] = myColor;
                 activity.updateGameBoard(currentBoard);
-                boolean winFlag = checkWin(6 - heights[col], col, myColor);
+                boolean winFlag = checkWin(6 - heights[col], col, myColor, winColor);
                 heights[col] += 1;
                 /* WRITE MOVE WITH BLUETOOTH*/
                 BluetoothController.getInstance().writeMove(new GameMove(col));
                 if (winFlag) {
                     wonGame();
+                    yourTurn = false;
                     return;
                 }
                 yourTurn = false;
@@ -97,7 +102,7 @@ public class GameController {
             if (heights[mostRecentMove.column] <= 6) {
                 currentBoard[6 - heights[mostRecentMove.column]][mostRecentMove.column] = opponentColor;
                 activity.updateGameBoard(currentBoard);
-                boolean winFlag = checkWin(6 - heights[mostRecentMove.column], mostRecentMove.column, opponentColor);
+                boolean winFlag = checkWin(6 - heights[mostRecentMove.column], mostRecentMove.column, opponentColor, loseColor);
                 heights[mostRecentMove.column] += 1;
                 if (winFlag) {
                     lostGame();
@@ -127,7 +132,7 @@ public class GameController {
         return true;
     }
 
-    public boolean checkWin(int row, int col, String color) {
+    public boolean checkWin(int row, int col, String color, String outcome) {
         boolean vertFlag = true;
         //Vertical Win
         if (row <= 3) {
@@ -139,7 +144,7 @@ public class GameController {
             }
             if (vertFlag == true) {
                 for (int i = row; i <= row + 3; ++i) {
-                    currentBoard[i][col] = "GREEN";
+                    currentBoard[i][col] = outcome;
                 }
                 activity.updateGameBoard(currentBoard);
                 return true;
@@ -165,7 +170,7 @@ public class GameController {
                 if(horizontalCount == 4)
                 {
                     for (int j = i; j >= i - 3; --j) {
-                        currentBoard[row][j] = "GREEN";
+                        currentBoard[row][j] = outcome;
                     }
                     activity.updateGameBoard(currentBoard);
                     return true;
@@ -192,7 +197,7 @@ public class GameController {
                 if(lrDiag == 4)
                 {
                     for (int j = 0; j >= -3; --j) {
-                        currentBoard[row + i + j][col + i + j] = "GREEN";
+                        currentBoard[row + i + j][col + i + j] = outcome;
                     }
                     activity.updateGameBoard(currentBoard);
                     return true;
@@ -222,7 +227,7 @@ public class GameController {
                 if(rlDiag == 4)
                 {
                     for (int j = 0; j >= -3; --j) {
-                        currentBoard[currR + j][currC - j] = "GREEN";
+                        currentBoard[currR + j][currC - j] = outcome;
                     }
                     activity.updateGameBoard(currentBoard);
                     return true;
