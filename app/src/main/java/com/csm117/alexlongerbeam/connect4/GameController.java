@@ -100,6 +100,10 @@ public class GameController {
                     yourTurn = false;
                     return;
                 }
+                if (checkFull()) {
+                    tieGame();
+                    return;
+                }
                 yourTurn = false;
                 updateStatusText();
             }
@@ -141,10 +145,20 @@ public class GameController {
                     lostGame();
                     return;
                 }
+                if (checkFull()) {
+                    tieGame();
+                    return;
+                }
                 yourTurn = true;
                 updateStatusText();
             }
         }
+    }
+
+    public void tieGame() {
+        activity.setStatusText("Tie Game");
+        activity.setButtonsVisible(true);
+        yourTurn = false;
     }
 
     public void endGame() {
@@ -172,7 +186,7 @@ public class GameController {
 
     public boolean checkFull() {
         for (int i = 0; i < heights.length; ++i) {
-            if (heights[i] < 6)
+            if (heights[i] < 7)
                 return false;
         }
         return true;
